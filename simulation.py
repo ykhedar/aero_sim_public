@@ -1,4 +1,4 @@
-from utils import util
+import util
 from matplotlib.patches import Rectangle
 import matplotlib.pyplot as plt
 from matplotlib import animation
