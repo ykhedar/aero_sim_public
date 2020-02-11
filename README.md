@@ -44,10 +44,10 @@ Create a new environment of type "Virtualenv Environment" with Python 3.6 or abo
 5. Once the setup is complete. Open up the "requirements.yml" from the "aero_sim" project. You will be prompted to install
 the dependencies from this file. Install all the requirements. See the following image for the hints.
 
-![Install Requirements Image](https://github.com/ykhedar/aero_sim_public/images/install_requirements.PNG)
+![Install Requirements Image](./images/install_requirements.PNG?raw=true)
 
 6. Open up the "simulation.py" file, right click anywhere and then click on "Run". See the image below. 
 
-![Run Simulation](https://github.com/ykhedar/aero_sim_public/images/run_simulation.png)
+![Run Simulation](./images/run_simulation.png?raw=true)
 
 The script should take 10-20 seconds to complete and at the end you will see a video in the output folder.
