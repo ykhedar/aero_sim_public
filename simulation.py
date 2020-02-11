@@ -7,7 +7,7 @@ from pathlib import Path
 import matplotlib.colors as mcolors
 
 
-crane_log_path = Path("C:\\Users\\khedar\\PycharmProjects\\aero_sim_1d\\input\\crane_log.csv")
+crane_log_path = Path("input\\crane_log.csv")
 
 
 def frame_gen(drone_):
@@ -33,6 +33,7 @@ class Simulation:
         # Initialisation
         self.patches_list = []
         self.ax.add_patch(Rectangle((5, 0), 350, 5, angle=0, lw=1, ec='b', fc=mcolors.CSS4_COLORS['lightgray']))
+        plt.text(5, 5.2, 'Mission Area')
         [self.ax.add_patch(crane_.get_vis_patch(0)) for crane_ in self.cranes]
         self.ax.add_patch(self.drone_.get_vis_patch())
         plt.tight_layout()
