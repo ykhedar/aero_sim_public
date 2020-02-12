@@ -12,7 +12,7 @@ crane_log_path = Path("input\\crane_log.csv")
 
 def frame_gen(drone_):
     b = 0
-    while not drone_.sim_end():
+    while not drone_.mission_end():
         b += 1
         yield b
 
@@ -22,15 +22,18 @@ class Simulation:
         self.fig = plt.figure(figsize=(20, 3))
         self.ax = plt.axes()
 
+        # Initialisation of the plot canvas
         plt.title('Simulation of drone movement for the mapping mission. (VIEW FROM THE TOP)')
         plt.xlabel('Distance Parallel to the Tracks (meter)')
         plt.ylabel('Width of the Mapping Area (meter)')
         plt.xlim(0, 360)
         plt.ylim(-1, 6)
+
+        # Initialise the cranes and drone class
         self.cranes = crane.get_cranes(crane_log_path)
         self.drone_ = drone.get_drone(10)
 
-        # Initialisation
+        # Initialisation of the crane and drone patches for visualisation in the simulation
         self.patches_list = []
         self.ax.add_patch(Rectangle((5, 0), 350, 5, angle=0, lw=1, ec='b', fc=mcolors.CSS4_COLORS['lightgray']))
         plt.text(5, 5.2, 'Mission Area')
@@ -44,6 +47,7 @@ class Simulation:
         self.patches_list = [crane.get_vis_patch(time) for crane in self.cranes]
         self.patches_list.append(self.drone_.get_vis_patch())
         self.patches_list.append(self.drone_.get_drone_text())
+        self.patches_list.append(self.drone_.get_mission_counter_text())
         [self.patches_list.append(crane_.get_crane_text(time)) for crane_ in self.cranes]
 
     def add_conflict_patch(self):
@@ -52,16 +56,25 @@ class Simulation:
         self.patches_list.append(conflict_patch)
 
     def update(self, time):
-        self.drone_.move_one_step()
         self.get_patches_list(time)
 
-        # Do the time update.
-        conflicts = [util.detect_overlap(self.drone_.get_vis_patch(), crane_.get_vis_patch(time)) for crane_ in self.cranes]
-        if any(conflicts):  # revisit it later
-            self.add_conflict_patch()
-        self.drone_.add_to_slot_list(conflicts)
+        # Check for conflicts.
+        conflicts = [util.detect_overlap(self.drone_.get_vis_patch(), crane_.get_vis_patch(time))
+                     for crane_ in self.cranes]
 
+        if any(conflicts):  # Mark it for re-fly mission.
+            self.add_conflict_patch()
+
+        # Strategy A: Just mark the conflict slots for a later re-fly mission
+        self.drone_.update_conflict_slot_list_no_wait(conflicts)
+
+        # Strategy B: Wait for 10 Seconds on a conflict before moving on.
+        # self.drone_.update_conflict_slot_list_wait_x_seconds(conflicts)
         return self.patches_list
+
+    def update_new_strategy(self, time):
+        # TODO Implement the new update strategy here.
+        print("Hello World")
 
     def animate(self):
         gen = frame_gen(self.drone_)
