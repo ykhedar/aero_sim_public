@@ -8,6 +8,7 @@ import matplotlib.colors as mcolors
 
 
 crane_log_path = Path("input\\crane_log.csv")
+drone_max_wait_time = 10  # Only used in the update_conflict_slot_list_wait_x_seconds() strategy.
 
 
 def frame_gen(drone_):
@@ -31,7 +32,7 @@ class Simulation:
 
         # Initialise the cranes and drone class
         self.cranes = crane.get_cranes(crane_log_path)
-        self.drone_ = drone.get_drone(10)
+        self.drone_ = drone.get_drone(drone_max_wait_time)
 
         # Initialisation of the crane and drone patches for visualisation in the simulation
         self.patches_list = []
@@ -66,10 +67,10 @@ class Simulation:
             self.add_conflict_patch()
 
         # Strategy A: Just mark the conflict slots for a later re-fly mission
-        self.drone_.update_conflict_slot_list_no_wait(conflicts)
+        # self.drone_.update_conflict_slot_list_no_wait(conflicts)
 
         # Strategy B: Wait for 10 Seconds on a conflict before moving on.
-        # self.drone_.update_conflict_slot_list_wait_x_seconds(conflicts)
+        self.drone_.update_conflict_slot_list_wait_x_seconds(conflicts)
         return self.patches_list
 
     def update_new_strategy(self, time):
