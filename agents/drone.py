@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib.patches import Rectangle
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
-
+import util
 
 class Drone:
     def __init__(self, wait_time=None):
@@ -23,6 +23,7 @@ class Drone:
         self.time_counter = 0
         self.wait_time_list = []
         self.velocity = 1.1    # m/s
+        self.countdown_time = wait_time
 
     def get_location(self):
         return self.current_location
@@ -105,9 +106,44 @@ class Drone:
 
         self.move_drone_one_step()
 
-    def new_drone_strategy(self):
+
+    def countdown(self):
+        self.countdown_time -= 1
+        temp = self.countdown_time
+        return temp
+
+
+    def reset_countdown(self):
+        self.countdown_time = self.wait_time
+
+
+    def update_conflict_slot_list_intelligent_wait(self, conflicts, is_wait):
         # TODO The new drone strategy should be implemented here.
-        print("Hello World!")
+        #if drone meets cranes, at first predict if the cranes move away in defined time
+        #if yes, wait if not direct move through the cranes und mark the slot.
+        if any(conflicts) and not self.slot_on:
+            if any(is_wait):
+                if self.do_wait_for_seconds():
+                    #self.slot_on = True
+                    #self.slot_list.append(self.getlocation())
+                    self.time_counter += 1
+                    print("is waiting")
+                    return
+            else:
+                self.slot_on = True
+                self.slot_list.append(self.get_location())
+                self.time_counter += 1
+                print("is not waiting")
+        if not (any(conflicts)) and self.slot_on:  # Make the slot off
+            self.slot_on = False
+            print("no conflict")
+            #self.slot_list.pop()
+
+        self.reset_countdown()
+        self.time_counter += 1
+        self.reset_wait_counter(conflicts)
+        self.move_drone_one_step()
+        print("time_counter:",self.time_counter)
 
 
 def get_drone(wait_time):

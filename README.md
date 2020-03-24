@@ -100,3 +100,33 @@ I believe you might not need to change anything else but if you need to then ple
 
 Since the code is already on github, if you have any doubts you could simply raise an issue there or 
 write and email. 
+
+##update an 24.03
+Now there are a new strategy implemented in this simulation toolbox. This new strategy is executed according to the following steps:
+
+1.fly with constant speed of 1.1m/s
+
+2.if the drone meets a crone at flying, a prediction will be executed to calculate if the crane will move away in a defined wait-time
+
+3.with the step 2 the drone will take a action in two different ways:
+
+    3.1:if the crone can move away in defined wait-time, the drone waits for a maximum of x-seconds and then moves forward.
+    
+    3.2:if the crane will have still confilcts with the drone, the drone moves directly forward and marks the slots.
+4 the mission stops when it reaches the maximum of mission-time or the maximum of flying-distance 
+
+    
+the new functions are implemented in drone.py and until.py:
+
+this function will countdown the wait_time for the function is_wait(time) to predict the future of crane
+````python
+countdown()
+````
+this function will accept a time parameter to calculate if the crane will be separate with the drone after accepted time parameter
+````python
+is_wait(time)
+````
+this function will update the information of drone by using the new strategy    
+````python
+update_conflict_slot_list_intelligent_wait(conflicts, is_wait)
+````

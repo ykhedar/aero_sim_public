@@ -15,3 +15,10 @@ def detect_overlap(drone_, crane_):
 
 def is_a_between(a, b, c):
     return b < a < c
+
+
+#hier a function will be implemented to predict if the crane move away in defined time
+def is_wait(drone_, crane_, time, wait_time):
+    if wait_time <= 0:
+        return False
+    return detect_overlap(drone_.get_vis_patch(), crane_.get_vis_patch(time+wait_time))
