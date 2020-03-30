@@ -73,7 +73,6 @@ class Simulation:
         self.drone_.update_conflict_slot_list_wait_x_seconds(conflicts)
         return self.patches_list
 
-
     def update_new_strategy(self, time):
         # TODO Implement the new update strategy here.
         self.get_patches_list(time)
@@ -91,12 +90,11 @@ class Simulation:
             print("slot_location:", self.drone_.get_location())
         return self.patches_list
 
-
     def animate(self):
         gen = frame_gen(self.drone_)
         anim2 = animation.FuncAnimation(self.fig, self.update_new_strategy, fargs=(), frames=gen,
                                         interval=1, blit=True, save_count=1000)
-        anim_name = 'output/anim_with_intelligent_wait.mp4'
+        anim_name = 'output/anim.mp4'
         anim2.save(anim_name, fps=10, extra_args=['-vcodec', 'libx264'])
 
 

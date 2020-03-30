@@ -4,6 +4,7 @@ import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import util
 
+
 class Drone:
     def __init__(self, wait_time=None):
         #  Drone Visualisation related variables.
@@ -22,7 +23,7 @@ class Drone:
         self.wait_counter = 0
         self.time_counter = 0
         self.wait_time_list = []
-        self.velocity = 1.1    # m/s
+        self.velocity = 1.1  # m/s
         self.countdown_time = wait_time
 
     def get_location(self):
@@ -38,12 +39,12 @@ class Drone:
 
     def get_drone_text(self):
         left, bottom = self.get_vis_patch().get_xy()
-        self.drone_text.set_x(left-0.1)
+        self.drone_text.set_x(left - 0.1)
         self.drone_text.set_y(bottom - 0.5)
         return self.drone_text
 
     def get_mission_counter_text(self):
-        self.mission_counter_text.set_text('Mission Counter: '+str(self.time_counter)+' Seconds')
+        self.mission_counter_text.set_text('Mission Counter: ' + str(self.time_counter) + ' Seconds')
         return self.mission_counter_text
 
     def move_drone_one_step(self):
@@ -106,46 +107,45 @@ class Drone:
 
         self.move_drone_one_step()
 
-
     def countdown(self):
         self.countdown_time -= 1
         temp = self.countdown_time
         return temp
 
-
     def reset_countdown(self):
         self.countdown_time = self.wait_time
 
-
     def update_conflict_slot_list_intelligent_wait(self, conflicts, is_wait):
         # TODO The new drone strategy should be implemented here.
-        #if drone meets cranes, at first predict if the cranes move away in defined time
-        #if yes, wait if not direct move through the cranes und mark the slot.
+        # if drone meets cranes, at first predict if the cranes move away in defined time
+        # if yes, wait if not direct move through the cranes und mark the slot.
         if any(conflicts) and not self.slot_on:
             if any(is_wait):
                 if self.do_wait_for_seconds():
-                    #self.slot_on = True
-                    #self.slot_list.append(self.getlocation())
+                    # self.slot_on = True
+                    # self.slot_list.append(self.getlocation())
                     self.time_counter += 1
                     print("is waiting")
                     return
             else:
                 self.slot_on = True
                 self.slot_list.append(self.get_location())
-                self.time_counter += 1
                 print("is not waiting")
+
+        if any(conflicts) and self.slot_on:
+            self.slot_list.append(self.get_location())
+
         if not (any(conflicts)) and self.slot_on:  # Make the slot off
             self.slot_on = False
             print("no conflict")
-            #self.slot_list.pop()
+            # self.slot_list.pop()
 
         self.reset_countdown()
         self.time_counter += 1
         self.reset_wait_counter(conflicts)
         self.move_drone_one_step()
-        print("time_counter:",self.time_counter)
+        print("time_counter:", self.time_counter)
 
 
 def get_drone(wait_time):
     return Drone(wait_time=wait_time)
-

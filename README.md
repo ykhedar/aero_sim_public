@@ -122,6 +122,10 @@ this function will countdown the wait_time for the function is_wait(time) to pre
 ````python
 countdown()
 ````
+this function will reset the timer to count down
+````python
+reset_countdown()
+````
 this function will accept a time parameter to calculate if the crane will be separate with the drone after accepted time parameter
 ````python
 is_wait(time)
@@ -130,3 +134,9 @@ this function will update the information of drone by using the new strategy
 ````python
 update_conflict_slot_list_intelligent_wait(conflicts, is_wait)
 ````
+###update an 30.03
+fix some issues in new strategy e.g. for old version timer_counter will count repeatedly in some cases 
+change the wait_time to 12 seconds to get a optimal mission time
+
+In next step i will intend to implement a various speed of crane function in new strategy：
+If the drone does not wait for a stopped crane(which will not move for a long time), then fly fast at 7 m/s, otherwise keep flying at normal speed. 
