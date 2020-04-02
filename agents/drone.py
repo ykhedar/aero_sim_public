@@ -2,6 +2,7 @@ import numpy as np
 from matplotlib.patches import Rectangle
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
+
 import util
 
 
@@ -108,8 +109,8 @@ class Drone:
         self.move_drone_one_step()
 
     def countdown(self):
-        self.countdown_time -= 1
         temp = self.countdown_time
+        self.countdown_time -= 1
         return temp
 
     def reset_countdown(self):
@@ -143,8 +144,15 @@ class Drone:
         self.reset_countdown()
         self.time_counter += 1
         self.reset_wait_counter(conflicts)
+        self.speed_change(is_wait)
         self.move_drone_one_step()
         print("time_counter:", self.time_counter)
+
+    def speed_change(self, is_waits):
+        if not (any(is_waits)) and self.slot_on:
+            self.velocity = 7
+        else:
+            self.velocity = 1.1
 
 
 def get_drone(wait_time):

@@ -101,7 +101,7 @@ I believe you might not need to change anything else but if you need to then ple
 Since the code is already on github, if you have any doubts you could simply raise an issue there or 
 write and email. 
 
-##update an 24.03
+## update an 24.03
 Now there are a new strategy implemented in this simulation toolbox. This new strategy is executed according to the following steps:
 
 1.fly with constant speed of 1.1m/s
@@ -134,9 +134,22 @@ this function will update the information of drone by using the new strategy
 ````python
 update_conflict_slot_list_intelligent_wait(conflicts, is_wait)
 ````
-###update an 30.03
+## update an 30.03
+
 fix some issues in new strategy e.g. for old version timer_counter will count repeatedly in some cases 
 change the wait_time to 12 seconds to get a optimal mission time
 
 In next step i will intend to implement a various speed of crane function in new strategy：
 If the drone does not wait for a stopped crane(which will not move for a long time), then fly fast at 7 m/s, otherwise keep flying at normal speed. 
+
+## update an 02.04
+
+1. make some changes in function is_wait, which caused before in problem at getting visual patch of crane 
+2. fix the issue about using function countdown in the function "update_new_strategy". the old version can execute function countdown 4 times in a update cycle
+
+moreover a new function "speed_change" is now implemented in drone module 
+
+this function will change the velocity of flying into 7m/s, if the drone don't wait for a stopped crane. in other cases drone will fly at normal speed of 1.1m/s
+```python
+speed_change()
+```

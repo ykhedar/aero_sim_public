@@ -8,7 +8,8 @@ import matplotlib.colors as mcolors
 plt.rcParams['animation.ffmpeg_path'] = 'E:\\ffmpeg\\ffmpeg-win64-static\\bin\\ffmpeg.exe'
 
 crane_log_path = Path("input\\crane_log.csv")
-drone_max_wait_time = 12  # Only used in the update_conflict_slot_list_wait_x_seconds() strategy.
+#crane_log_path = Path("input\\logs\\2_processed.csv")
+drone_max_wait_time = 10  # Only used in the update_conflict_slot_list_wait_x_seconds() strategy.
 
 
 def frame_gen(drone_):
@@ -78,23 +79,28 @@ class Simulation:
         self.get_patches_list(time)
         conflicts = [util.detect_overlap(self.drone_.get_vis_patch(), crane_.get_vis_patch(time))
                      for crane_ in self.cranes]
-
+        print("conficts: ", conflicts)
         # self.get_patches_list(time)
         is_waits = []
+        print(self.drone_.countdown_time)
         if any(conflicts):
-            is_waits = [util.is_wait(self.drone_, crane_, time, self.drone_.countdown())
+            countdown = self.drone_.countdown()
+            is_waits = [util.is_wait(self.drone_, crane_, time, countdown)
                     for crane_ in self.cranes]
-        self.drone_.update_conflict_slot_list_intelligent_wait(conflicts, is_waits)
+            print(self.drone_.countdown_time)
+        print("overlap:", is_waits)
         if not (any(is_waits)) and any(conflicts):
             self.add_conflict_patch()
             print("slot_location:", self.drone_.get_location())
+
+        self.drone_.update_conflict_slot_list_intelligent_wait(conflicts, is_waits)
         return self.patches_list
 
     def animate(self):
         gen = frame_gen(self.drone_)
         anim2 = animation.FuncAnimation(self.fig, self.update_new_strategy, fargs=(), frames=gen,
                                         interval=1, blit=True, save_count=1000)
-        anim_name = 'output/anim.mp4'
+        anim_name = 'output/animwithspeedchange.mp4'
         anim2.save(anim_name, fps=10, extra_args=['-vcodec', 'libx264'])
 
 
