@@ -23,7 +23,7 @@ class Simulation:
         self.ax = plt.axes()
 
         # Initialisation of the plot canvas
-        plt.title('Simulation of drone movement for the mapping mission. (VIEW FROM THE TOP)')
+
         plt.xlabel('Distance Parallel to the Tracks (meter)')
         plt.ylabel('Width of the Mapping Area (meter)')
         plt.xlim(0, 360)

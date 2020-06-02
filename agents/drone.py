@@ -14,7 +14,7 @@ class Drone:
         self.mission_counter_text = plt.text(150, 5.2, 'Mission Counter')
 
         # Drone Mission related variables.
-        self.total_mission_duration = 350  # Seconds
+        self.total_mission_duration = 400  # Seconds
         self.current_location = 0  # starting from zero meter
         self.slot_on = False
         self.slot_list = []
@@ -23,6 +23,9 @@ class Drone:
         self.time_counter = 0
         self.wait_time_list = []
         self.velocity = 1.1    # m/s
+        self.fast_velocity = 7   # m/s
+
+        self.refly_slots = []
 
     def get_location(self):
         return self.current_location
@@ -47,6 +50,11 @@ class Drone:
 
     def move_drone_one_step(self):
         self.current_location = self.current_location + self.velocity
+
+    def move_drone_one_step_fast(self):
+        old_location = self.current_location
+        self.current_location = old_location + self.fast_velocity
+        self.refly_slots.append([old_location, self.current_location])
 
     def get_slot_list(self):
         file_ = open(self.outfile, "w")
@@ -105,8 +113,14 @@ class Drone:
 
         self.move_drone_one_step()
 
-    def new_drone_strategy(self):
+    def update_drone_stratetgy_c(self, current_situation):
         # TODO The new drone strategy should be implemented here.
+        # do something with the current_situation
+        move_slow = True
+        if move_slow:
+            self.move_drone_one_step()
+        else:
+            self.move_drone_one_step_fast()
         print("Hello World!")
 
 
