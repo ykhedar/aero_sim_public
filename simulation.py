@@ -1,20 +1,30 @@
 import util
+import matplotlib
+from matplotlib.colors import to_rgba
 from matplotlib.patches import Rectangle
 import matplotlib.pyplot as plt
 from matplotlib import animation
 from agents import crane, drone
 from pathlib import Path
 import matplotlib.colors as mcolors
+
 plt.rcParams['animation.ffmpeg_path'] = 'E:\\ffmpeg\\ffmpeg-win64-static\\bin\\ffmpeg.exe'
 
-crane_log_path = Path("input\\crane_log.csv")
-#crane_log_path = Path("input\\logs\\2_processed.csv")
+crane_log_path = Path("input\\logs\\4_processed.csv")
+# crane_log_path = Path("input\\logs\\2_processed.csv")
 drone_max_wait_time = 10  # Only used in the update_conflict_slot_list_wait_x_seconds() strategy.
 
 
 def frame_gen(drone_):
     b = 0
     while not drone_.mission_end():
+        b += 1
+        yield b
+
+
+def frame_gen1(drone_):
+    b = 0
+    while drone_.firstfly_mark or drone_.refly_mark:
         b += 1
         yield b
 
@@ -68,10 +78,11 @@ class Simulation:
             self.add_conflict_patch()
 
         # Strategy A: Just mark the conflict slots for a later re-fly mission
-        #self.drone_.update_conflict_slot_list_no_wait(conflicts)
+        # self.drone_.update_conflict_slot_list_no_wait(conflicts)
 
         # Strategy B: Wait for 10 Seconds on a conflict before moving on.
         self.drone_.update_conflict_slot_list_wait_x_seconds(conflicts)
+        print(self.drone_.time_counter)
         return self.patches_list
 
     def update_new_strategy(self, time):
@@ -86,7 +97,7 @@ class Simulation:
         if any(conflicts):
             countdown = self.drone_.countdown()
             is_waits = [util.is_wait(self.drone_, crane_, time, countdown)
-                    for crane_ in self.cranes]
+                        for crane_ in self.cranes]
             print(self.drone_.countdown_time)
         print("overlap:", is_waits)
         if not (any(is_waits)) and any(conflicts):
@@ -96,11 +107,47 @@ class Simulation:
         self.drone_.update_conflict_slot_list_intelligent_wait(conflicts, is_waits)
         return self.patches_list
 
+    # this function will delete the marked slot if the marked slot can be detected at reflying
+    def delete_conflict_patch(self):
+        for patch in self.ax.patches:
+            if not isinstance(patch, matplotlib.text.Text):
+                # print('waiting for deleting patch')
+                # print(patch.get_facecolor())
+                # print(to_rgba('red'))
+                # print(util.detect_overlap(self.drone_.get_vis_patch(), patch))
+                if patch.get_facecolor() == to_rgba('red') and util.detect_overlap(self.drone_.get_vis_patch(), patch):
+                    print('removing')
+                    print('velocity:', self.drone_.velocity)
+                    print('time:', self.drone_.time_counter)
+                    self.ax.patches.remove(patch)
+
+    def get_conflict_patches(self):
+        patches = []
+        for patch in self.ax.patches:
+            if patch.get_facecolor() == to_rgba('red'):
+                patches.append(patch)
+        return patches
+
+    # this function implemented a second new strategy to make a mission planning
+    def update_second_new_strategy(self, time):
+        self.get_patches_list(time)
+        conflicts = [util.detect_overlap(self.drone_.get_vis_patch(), crane_.get_vis_patch(time))
+                     for crane_ in self.cranes]
+        if any(conflicts) and self.drone_.firstfly_mark:  # Mark it for re-fly mission.
+            self.add_conflict_patch()
+        crane_vis_patch = [crane_.get_vis_patch(time) for crane_ in self.cranes]
+        if self.drone_.refly_mark:
+            if not any(conflicts):
+                self.delete_conflict_patch()
+        conflict_patches = self.get_conflict_patches()
+        self.drone_.update_conflict_slot_list_no_wait_variant(conflicts, crane_vis_patch, conflict_patches)
+        return self.patches_list
+
     def animate(self):
-        gen = frame_gen(self.drone_)
-        anim2 = animation.FuncAnimation(self.fig, self.update_new_strategy, fargs=(), frames=gen,
+        gen = frame_gen1(self.drone_)
+        anim2 = animation.FuncAnimation(self.fig, self.update_second_new_strategy, fargs=(), frames=gen,
                                         interval=1, blit=True, save_count=1000)
-        anim_name = 'output/animwithspeedchange.mp4'
+        anim_name = 'output/test4.mp4'
         anim2.save(anim_name, fps=10, extra_args=['-vcodec', 'libx264'])
 
 

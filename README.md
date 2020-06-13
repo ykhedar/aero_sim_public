@@ -153,3 +153,25 @@ this function will change the velocity of flying into 7m/s, if the drone don't w
 ```python
 speed_change()
 ```
+
+## update an 13.06
+implemented a second new strategy, this new strategy will be executed in two processes.
+At first the drone will fly at speed of 1.1 m/s directly through the whole path and meanwhile mark the slots when it meets a crane
+After finishing the first mission planning the drone will detect if the cranes stop still at the slots. If the cranes move away the slots, drone will
+execute the second mission planning. In the second mission planning the drone will refly at 7m/s to start point. When it comes to the marked slots, it will reduce 
+the speed to 1.1m/s and remove the not occluded slots. 
+
+some new functions will be implemented in drone.py and simulation.py:
+
+this function is implemented in drone.py, it will update the motion of drone by the new strategy
+````python
+update_conflict_slot_list_no_wait_variant()
+````
+this function will guarantee that the animation will not stop after finishing first mission planning
+````
+frame_gen1(drone_):
+````
+this function will delete the not occluded slots at a second mission planning
+````
+delete_conflict_patch()
+````

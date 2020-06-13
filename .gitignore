@@ -3,3 +3,5 @@ venv/
 *.pyc
 */*.pyc
 *~
+bayesian_test.py
+strategy_c.py

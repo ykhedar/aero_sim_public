@@ -26,6 +26,8 @@ class Drone:
         self.wait_time_list = []
         self.velocity = 1.1  # m/s
         self.countdown_time = wait_time
+        self.firstfly_mark = 1
+        self.refly_mark = 0
 
     def get_location(self):
         return self.current_location
@@ -153,6 +155,44 @@ class Drone:
             self.velocity = 7
         else:
             self.velocity = 1.1
+
+    def update_conflict_slot_list_no_wait_variant(self, conflicts, cranes, patches):
+        if self.is_second_fly(cranes):
+            self.firstfly_mark = 0
+        if self.firstfly_mark:
+            self.update_conflict_slot_list_no_wait(conflicts)
+            return
+        if self.refly_mark:
+            # new strategy will be implemented hier
+            if self.current_location <= 0:
+                self.refly_mark = 0
+                return
+            self.time_counter += 1
+            if not any(conflicts):
+                for patch in patches:
+                    if util.detect_overlap(self.get_vis_patch(), patch):
+                        self.velocity = 1.1
+                        # self.delete_slot(slot)
+                        self.move_back_one_step()
+                        print('is meeting')
+                        return
+            self.velocity = 7
+            self.move_back_one_step()
+
+    def delete_slot(self, slot):
+        self.slot_list.remove(slot)
+
+    def move_back_one_step(self):
+        self.current_location = self.current_location - self.velocity
+
+    def is_second_fly(self, cranes):
+        if self.mission_end():
+            if util.is_in_slots(cranes, self.slot_list):
+                self.refly_mark = 1
+                return True
+            else:
+                return False
+        return False
 
 
 def get_drone(wait_time):
